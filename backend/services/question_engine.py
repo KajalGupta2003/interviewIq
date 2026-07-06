@@ -9,7 +9,9 @@ from services.resume_extractor import (
     extract_achievements
 )
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+from config import GROQ_API_KEY
+
+client = Groq(api_key=GROQ_API_KEY)
 
 def call_llm(prompt: str) -> str:
     response = client.chat.completions.create(

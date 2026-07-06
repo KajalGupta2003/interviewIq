@@ -1,10 +1,9 @@
 import requests
-import os
 
-ELEVEN_API_KEY = os.getenv("ELEVEN_API_KEY")
+from config import ELEVEN_API_KEY,VOICE_ID
 
 
-VOICE_ID = "ImyAQXVPmdjA0EnqOdjw"
+
 
 
 def text_to_speech(text: str) -> bytes:
