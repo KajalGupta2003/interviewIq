@@ -1,7 +1,19 @@
 import Navbar from "./components/Navbar";
 import Card from "./components/Card";
-
+import { useState, useEffect } from "react";
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 function App() {
+
+  const [user, setUser] = useState(null);
+
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
+
+  return () => unsubscribe();
+}, []);
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-indigo-500/30">
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 overflow-hidden">
@@ -9,7 +21,7 @@ function App() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full" />
       </div>
 
-      <Navbar />
+      <Navbar user={user} setUser={setUser} />
 
       <main className="flex flex-col items-center justify-center pt-32 pb-20 px-6">
         <div className="max-w-4xl w-full text-center mb-12">
@@ -22,7 +34,7 @@ function App() {
             The AI-powered mock interview platform designed to get you hired.
           </p>
         </div>
-        <Card />
+        <Card user={user} />
       </main>
     </div>
   );
