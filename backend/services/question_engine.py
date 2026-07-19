@@ -1,6 +1,8 @@
+print("QUESTION ENGINE EXECUTED")
 import json
-import os
+
 from groq import Groq
+from logger import logger
 from services.parser import extract_text_from_pdf
 from services.resume_extractor import (
     extract_skills,
@@ -10,15 +12,17 @@ from services.resume_extractor import (
 )
 
 from config import GROQ_API_KEY
-
+print("========== NEW QUESTION_ENGINE FILE LOADED ==========")
 client = Groq(api_key=GROQ_API_KEY)
 
 def call_llm(prompt: str) -> str:
+    logger.info("Sending request to Groq...")
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         max_tokens=1000,
         messages=[{"role": "user", "content": prompt}]
     )
+    logger.info("Groq response received successfully")
     return response.choices[0].message.content
 
 
@@ -86,6 +90,9 @@ Return ONLY valid JSON, no explanation, no markdown:
 
     try:
         text = call_llm(prompt)
+
+        logger.info(f"Raw Groq Response:\n{text}")
+        print("Raw Groq Response:\n", text)
         text = text.replace("```json", "").replace("```", "").strip()
 
         start = text.find("{")
@@ -111,6 +118,7 @@ Return ONLY valid JSON, no explanation, no markdown:
 
     except json.JSONDecodeError as e:
         print(f"JSON parse error: {e}")
+        logger.error(f"Question JSON parse error: {e}")
         return {"questions": {"easy": [], "medium": [], "hard": []}, "total": 0, "resume_context": ""}
 
     except Exception as e:
@@ -154,11 +162,24 @@ Interview Question:
 Candidate's Answer:
 {answer}
 
-Evaluate the answer and return ONLY valid JSON, no explanation, no markdown:
+Evaluate the candidate objectively.
+
+Scoring Rules:
+- 9-10 = Excellent
+- 7-8 = Good
+- 5-6 = Average
+- 3-4 = Weak
+- 0-2 = Incorrect
+
+Return ONLY valid JSON.
+
 {{
-  "score": <integer 0-10>,
-  "feedback": "<one sentence feedback>",
-  "missed_points": ["<point1>", "<point2>"]
+    "score": 0,
+    "feedback": "",
+    "strengths": [],
+    "weaknesses": [],
+    "missed_points": [],
+    "ideal_answer": ""
 }}
 """
         try:
@@ -170,14 +191,30 @@ Evaluate the answer and return ONLY valid JSON, no explanation, no markdown:
             text  = text[start:end]
 
             result = json.loads(text)
+            print("========== RAW LLM RESPONSE ==========")
+            print(text)
 
-            score    = result.get("score", 0)
+            print("========== PARSED RESULT ==========")
+            print(result)
+            logger.info(f"Parsed JSON:\n{result}")
+            print("Parsed JSON:\n", result)
+
+            score = result.get("score", 0)
             feedback = result.get("feedback", "")
-            missed   = result.get("missed_points", [])
+            strengths = result.get("strengths", [])
+            weaknesses = result.get("weaknesses", [])
+            missed = result.get("missed_points", [])
+            ideal_answer = result.get("ideal_answer", "")
 
         except Exception as e:
             print(f"Evaluation error: {e}")
-            score, feedback, missed = 0, "Could not evaluate answer.", []
+
+            score = 0
+            feedback = "Could not evaluate answer."
+            strengths = []
+            weaknesses = []
+            missed = []
+            ideal_answer = ""
 
         self.scores.append(score)
         self.answered.append({
@@ -185,11 +222,25 @@ Evaluate the answer and return ONLY valid JSON, no explanation, no markdown:
             "answer":        answer,
             "score":         score,
             "feedback":      feedback,
-            "missed_points": missed
+            "strengths": strengths,
+            "weaknesses": weaknesses,
+            "missed_points": missed,
+            "ideal_answer": ideal_answer
         })
 
-        return {"score": score, "feedback": feedback, "missed_points": missed}
+        response = {
+            "score": score,
+            "feedback": feedback,
+            "strengths": strengths,
+            "weaknesses": weaknesses,
+            "missed_points": missed,
+            "ideal_answer": ideal_answer
+        }
 
+        logger.info(f"Returning Response:\n{response}")
+        print("Returning Response:\n", response)
+
+        return response
     def interview_summary(self) -> dict:
         if not self.scores:
             return {"average_score": 0, "total_questions": 0, "details": []}

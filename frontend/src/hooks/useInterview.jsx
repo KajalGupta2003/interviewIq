@@ -179,6 +179,7 @@ export const useInterview = () => {
         question: currentQuestionRef.current,
         answer,
       });
+      console.log(res.data);
 
       setData((prev) => ({
         ...prev,
@@ -193,7 +194,10 @@ export const useInterview = () => {
             answer,
             score: res.data.score.score,
             feedback: res.data.score.feedback,
+            strengths: res.data.score.strengths || [],
+            weaknesses: res.data.score.weaknesses || [],
             missed_points: res.data.score.missed_points || [],
+            ideal_answer: res.data.score.ideal_answer || "",
           },
         ],
       }));

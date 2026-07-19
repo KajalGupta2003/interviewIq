@@ -1,4 +1,5 @@
 
+print("MAIN FILE EXECUTED")
 from fastapi.responses import StreamingResponse
 from services.voice import text_to_speech
 import io
@@ -11,6 +12,9 @@ from config import FRONTEND_URL,ALLOWED_DURATIONS
 from services.parser import extract_text_from_pdf
 from services.resume_extractor import extract_skills, extract_experience, extract_projects, extract_achievements
 from services.question_engine import generate_questions, InterviewSession
+import services.question_engine
+print("Imported from:", generate_questions.__module__)
+print("Loaded from:", services.question_engine.__file__)
 from services.vision import analyze_frame
 app = FastAPI()
 
@@ -146,6 +150,8 @@ async def submit_answer(data: dict):
         raise HTTPException(status_code=400, detail="Interview not started")
 
     score  = session.submit_answer(data["question"], data["answer"])
+    logger.info(f"Score object from question_engine: {score}")
+    print("Score object:", score)
     next_q = session.next_question()
 
     if next_q is None:

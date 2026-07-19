@@ -50,28 +50,77 @@ const InterviewView = ({
         </div>
       )}
 
-      {/* ── 4. Evaluation Result with ScoreBadge ── */}
-      {stage === "result" && feedback && (
-        <div className="bg-black/30 rounded-xl p-4 mb-5 border border-white/10 animate-in fade-in zoom-in duration-300">
-          <div className="flex items-center gap-3 mb-2">
-            <ScoreBadge score={feedback.score} />
-            <span className="text-sm text-gray-300">{feedback.feedback}</span>
-          </div>
-          {feedback.missed_points?.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-white/5">
-              <p className="text-xs text-gray-500 mb-1 font-bold uppercase">
-                Could improve on:
-              </p>
-              {feedback.missed_points.map((mp, i) => (
-                <p key={i} className="text-xs text-yellow-400/80">
-                  • {mp}
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {/* ── 4. Evaluation Result  ── */}
+    
+{stage === "result" && feedback && (
+  <div className="bg-black/30 rounded-xl p-4 mb-5 border border-white/10 animate-in fade-in zoom-in duration-300">
 
+    <div className="flex items-center gap-3 mb-3">
+      <ScoreBadge score={feedback.score} />
+      <span className="text-sm text-gray-300">
+        {feedback.feedback}
+      </span>
+    </div>
+
+    {/* Strengths */}
+    {feedback.strengths?.length > 0 && (
+      <div className="mb-3">
+        <p className="text-xs text-green-400 font-bold uppercase mb-1">
+          Strengths
+        </p>
+
+        {feedback.strengths.map((item, i) => (
+          <p key={i} className="text-xs text-green-300">
+            • {item}
+          </p>
+        ))}
+      </div>
+    )}
+
+    {/* Weaknesses */}
+    {feedback.weaknesses?.length > 0 && (
+      <div className="mb-3">
+        <p className="text-xs text-red-400 font-bold uppercase mb-1">
+          Weaknesses
+        </p>
+
+        {feedback.weaknesses.map((item, i) => (
+          <p key={i} className="text-xs text-red-300">
+            • {item}
+          </p>
+        ))}
+      </div>
+    )}
+
+    {/* Missed Points */}
+    {feedback.missed_points?.length > 0 && (
+      <div className="mb-3">
+        <p className="text-xs text-yellow-400 font-bold uppercase mb-1">
+          Missed Points
+        </p>
+
+        {feedback.missed_points.map((item, i) => (
+          <p key={i} className="text-xs text-yellow-300">
+            • {item}
+          </p>
+        ))}
+      </div>
+    )}
+
+    {/* Ideal Answer */}
+    {feedback.ideal_answer && (
+      <div className="border-t border-white/10 pt-3">
+        <p className="text-xs text-cyan-400 font-bold uppercase mb-1">
+          Ideal Answer
+        </p>
+
+        <p className="text-sm text-gray-300 leading-relaxed">
+          {feedback.ideal_answer}
+        </p>
+      </div>
+    )}
+  </div>
+)}
       {error && (
         <p className="text-red-400 text-sm mb-3 bg-red-400/10 p-2 rounded">
           {error}
