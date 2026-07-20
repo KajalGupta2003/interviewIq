@@ -12,5 +12,5 @@ VOICE_ID = os.getenv(
     "ImyAQXVPmdjA0EnqOdjw"
 )
 ALLOWED_DURATIONS=[5,10,15,20]
-
+MONGODB_URI = os.getenv("MONGODB_URI")
 MAX_PDF_SIZE=5*1024*1024

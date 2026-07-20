@@ -1,7 +1,7 @@
 
 import { auth, provider } from "../firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
-
+import axios from "axios";
 
 const Navbar = ({ user, setUser }) => {
   
@@ -10,7 +10,15 @@ const Navbar = ({ user, setUser }) => {
       const result = await signInWithPopup(auth, provider);
       
 
+      
+
+      await axios.post("http://localhost:8000/save_user", {
+        name: result.user.displayName,
+        email: result.user.email,
+        photo: result.user.photoURL,
+      });
       console.log("User:", result.user);
+      console.log("User saved successfully");
     } catch (error) {
       console.error(error);
       alert(error.message);

@@ -3,6 +3,9 @@ import Card from "./components/Card";
 import { useState, useEffect } from "react";
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { Routes, Route } from "react-router-dom";
+import Dashboard from "./components/Dashboard";
+import InterviewDetails from "./components/InterviewDetails";
 function App() {
 
   const [user, setUser] = useState(null);
@@ -22,7 +25,10 @@ useEffect(() => {
       </div>
 
       <Navbar user={user} setUser={setUser} />
-
+      <Routes>
+        <Route
+           path="/"
+           element={
       <main className="flex flex-col items-center justify-center pt-32 pb-20 px-6">
         <div className="max-w-4xl w-full text-center mb-12">
           <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[1.1] mb-6">
@@ -36,6 +42,17 @@ useEffect(() => {
         </div>
         <Card user={user} />
       </main>
+           }
+           />
+            <Route
+        path="/dashboard"
+        element={<Dashboard user={user} />}
+      />
+            <Route
+              path="/interview/:id"
+              element={<InterviewDetails />}
+            />
+    </Routes>
     </div>
   );
 }

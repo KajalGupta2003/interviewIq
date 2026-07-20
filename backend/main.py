@@ -16,6 +16,10 @@ import services.question_engine
 print("Imported from:", generate_questions.__module__)
 print("Loaded from:", services.question_engine.__file__)
 from services.vision import analyze_frame
+from database import db,interviews_collection
+from models.user import User
+from models.interview import Interview
+from bson import ObjectId
 app = FastAPI()
 
 app.add_middleware(
@@ -37,6 +41,89 @@ def home():
     logger.info("Backend is running")
     return {"message": "InterviewIQ Backend Running"}
 
+
+@app.post("/save_user")
+async def save_user(user: User):
+
+    users_collection = db["users"]
+
+    existing_user = users_collection.find_one({
+        "email": user.email
+    })
+
+    if existing_user:
+        return {
+            "message": "User already exists",
+            "user_id": str(existing_user["_id"])
+        }
+
+    result = users_collection.insert_one({
+        "name": user.name,
+        "email": user.email,
+        "photo": user.photo
+    })
+
+    return {
+        "message": "User created successfully",
+        "user_id": str(result.inserted_id)
+    }
+
+
+
+@app.post("/save_interview")
+async def save_interview(interview: Interview):
+
+    # interviews_collection = db["interviews"]
+
+    result = interviews_collection.insert_one({
+        "userEmail": interview.userEmail,
+        "role": interview.role,
+        "duration": interview.duration,
+        "score": interview.score,
+        "summary": interview.summary,
+        "completedAt": interview.completedAt
+    })
+
+    return {
+        "message": "Interview saved successfully",
+        "interview_id": str(result.inserted_id)
+    }
+
+
+
+@app.get("/user_interviews/{email}")
+async def get_user_interviews(email: str):
+
+    interviews = list(
+        interviews_collection.find(
+            {"userEmail": email}
+        )
+    )
+
+    for interview in interviews:
+        interview["_id"] = str(interview["_id"])
+
+    return {
+        "interviews": interviews
+    }
+
+    
+@app.get("/interview/{id}")
+async def get_interview(id: str):
+
+    interview = interviews_collection.find_one(
+        {"_id": ObjectId(id)}
+    )
+
+    if not interview:
+        raise HTTPException(
+            status_code=404,
+            detail="Interview not found"
+        )
+
+    interview["_id"] = str(interview["_id"])
+
+    return interview
 
 @app.post("/upload")
 async def upload_resume(resume: UploadFile = File(...)):

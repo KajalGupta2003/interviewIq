@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useRef} from "react";
 import { useInterview, STAGE } from "../hooks/useInterview";
 import SetupView from "./Interview/SetupView";
 import InterviewView from "./Interview/InterviewView";
 import SummaryView from "./Interview/SummaryView";
 import Camera from "./Camera";
 import Timer from "./Timer";
+import axios from "axios";
 
-const Card = () => {
+const Card = ({ user }) => {
   const {
     stage,
     setStage,
@@ -22,7 +23,7 @@ const Card = () => {
   const [time, setTime] = useState("");
   const [isStarting, setIsStarting] = useState(false);
   const [sessionData, setSessionData] = useState([]);
-
+  const interviewSaved = useRef(false);
   const isInterviewActive = stage !== STAGE.SETUP && stage !== STAGE.FINISHED;
 
   // ✅ Moved before early returns, fixed all 3 bugs
@@ -74,38 +75,64 @@ const Card = () => {
     setStage(STAGE.FINISHED); // ✅ fixed from details()
   };
 
-  // ✅ Enrich backend summary with camera data when interview finishes normally
-  useEffect(() => {
-    if (data.summary && !data.summary.camera && sessionData.length > 0) {
-      const totalBlinks = sessionData.filter((p) => p.blink).length;
-      const eyeContactPoints = sessionData.filter(
-        (p) => p.eye_contact === "Looking at screen",
-      ).length;
-      const eyeContactPercent = Math.round(
-        (eyeContactPoints / sessionData.length) * 100,
-      );
-      const confidence =
-        eyeContactPercent >= 70
-          ? "High"
-          : eyeContactPercent >= 40
-            ? "Medium"
-            : "Low";
+  
 
-      setData((prev) => ({
-        ...prev,
-        summary: {
-          ...prev.summary,
-          camera: {
-            total_blinks: totalBlinks,
-            eye_contact_percent: eyeContactPercent,
-            confidence,
-          },
-        },
-      }));
+
+ useEffect(() => {
+  if (!user || !data.summary || interviewSaved.current) return;
+
+  interviewSaved.current = true;
+
+  const saveInterview = async () => {
+    try {
+      const avgScore = data.summary.average_score || 0;
+
+      const totalBlinks = sessionData.filter((p) => p.blink).length;
+
+const eyeContactPoints = sessionData.filter(
+  (p) => p.eye_contact === "Looking at screen"
+).length;
+
+const eyeContactPercent = sessionData.length
+  ? Math.round((eyeContactPoints / sessionData.length) * 100)
+  : 0;
+
+const confidence =
+  eyeContactPercent >= 70
+    ? "High"
+    : eyeContactPercent >= 40
+    ? "Medium"
+    : "Low";
+
+const summaryToSave = {
+  ...data.summary,
+  camera: {
+    total_blinks: totalBlinks,
+    eye_contact_percent: eyeContactPercent,
+    confidence,
+  },
+};
+console.log("Summary before saving:", summaryToSave);    
+  await axios.post("http://localhost:8000/save_interview", {
+        userEmail: user.email,
+        role,
+        duration: parseInt(time),
+        score: avgScore,
+        summary: summaryToSave,
+      });
+
+      console.log("Interview saved successfully");
+    } catch (err) {
+      console.error("Failed to save interview:", err);
     }
-  }, [data.summary]);
+  };
+
+  saveInterview();
+}, [data.summary, user]);
+
 
   const handleStart = async () => {
+    interviewSaved.current = false;
     if (!file || !role || !time) {
       setData((prev) => ({ ...prev, error: "Please fill all fields." }));
       return;
