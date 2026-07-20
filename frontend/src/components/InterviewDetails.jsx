@@ -43,29 +43,29 @@ const InterviewDetails = () => {
         <p><strong>Score:</strong> {interview.score}</p>
         <p><strong>Performance:</strong> {interview.summary.performance}</p>
         {interview.summary.camera && (
-  <>
-    <h2 className="text-2xl font-bold mt-8 mb-4">
-      Camera Analysis
-    </h2>
+          <>
+            <h2 className="text-2xl font-bold mt-8 mb-4">
+              Camera Analysis
+            </h2>
 
-    <div className="border border-gray-700 rounded-xl p-5 space-y-3">
-      <p>
-        <strong>Total Blinks:</strong>{" "}
-        {interview.summary.camera.total_blinks}
-      </p>
+            <div className="border border-gray-700 rounded-xl p-5 space-y-3">
+              <p>
+                <strong>Total Blinks:</strong>{" "}
+                {interview.summary.camera.total_blinks}
+              </p>
 
-      <p>
-        <strong>Eye Contact:</strong>{" "}
-        {interview.summary.camera.eye_contact_percent}%
-      </p>
+              <p>
+                <strong>Eye Contact:</strong>{" "}
+                {interview.summary.camera.eye_contact_percent}%
+              </p>
 
-      <p>
-        <strong>Confidence:</strong>{" "}
-        {interview.summary.camera.confidence}
-      </p>
-    </div>
-  </>
-)}
+              <p>
+                <strong>Confidence:</strong>{" "}
+                {interview.summary.camera.confidence}
+              </p>
+            </div>
+          </>
+        )}
         <p>
           <strong>Total Questions:</strong>{" "}
           {interview.summary.total_questions}
