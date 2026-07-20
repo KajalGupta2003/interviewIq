@@ -1,7 +1,7 @@
 import Button from "../UI/Button";
 import ScoreBadge from "../UI/ScoreBadge";
 
-const SummaryView = ({ summary, sessionData }) => {
+const SummaryView = ({ summary, user }) => {
   const avg = summary.average_score;
   const cam = summary.camera;
   return (
@@ -31,13 +31,12 @@ const SummaryView = ({ summary, sessionData }) => {
           </p>
           <p
             className={`mt-3 inline-block px-4 py-1 rounded-full text-xs font-bold uppercase border
-            ${
-              avg >= 8
+            ${avg >= 8
                 ? "bg-green-400/10 border-green-400/20 text-green-400"
                 : avg >= 5
                   ? "bg-yellow-400/10 border-yellow-400/20 text-yellow-400"
                   : "bg-red-400/10 border-red-500/20 text-red-400"
-            }`}
+              }`}
           >
             {summary.performance}
           </p>
@@ -51,13 +50,12 @@ const SummaryView = ({ summary, sessionData }) => {
             </p>
             <p
               className={`text-lg font-bold
-              ${
-                cam.confidence === "High"
+              ${cam.confidence === "High"
                   ? "text-green-400"
                   : cam.confidence === "Medium"
                     ? "text-yellow-400"
                     : "text-red-400"
-              }`}
+                }`}
             >
               {cam.confidence}
             </p>
@@ -68,13 +66,12 @@ const SummaryView = ({ summary, sessionData }) => {
             </p>
             <p
               className={`text-lg font-bold
-              ${
-                cam.eye_contact_percent >= 70
+              ${cam.eye_contact_percent >= 70
                   ? "text-green-400"
                   : cam.eye_contact_percent >= 40
                     ? "text-yellow-400"
                     : "text-red-400"
-              }`}
+                }`}
             >
               {cam.eye_contact_percent}%
             </p>
@@ -152,7 +149,21 @@ const SummaryView = ({ summary, sessionData }) => {
           </div>
         ))}
       </div>
-
+      {user ? (
+        <div className="mt-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
+          <p className="text-green-400 text-sm text-center font-medium">
+            ✅ Interview saved successfully. You can view it anytime from your Dashboard.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-6 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+          <p className="text-yellow-400 text-sm text-center font-medium">
+            ⚠️ This interview was not saved because you're using Guest Mode.
+            <br />
+            Login with Google to save future interviews and access them from your Dashboard.
+          </p>
+        </div>
+      )}
       {/* ── 3. Restart Button using Atomic Button ── */}
       <Button
         onClick={() => window.location.reload()}

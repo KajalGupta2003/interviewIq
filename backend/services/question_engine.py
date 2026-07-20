@@ -55,7 +55,14 @@ ACHIEVEMENTS:
 # ── 2. Question Generator ─────────────────────────────────────────────────────
 
 def generate_questions(pdf_file, job_role, interview_duration_minutes):
-    num_questions = max(3, interview_duration_minutes // 2)
+    if interview_duration_minutes <= 5:
+        num_questions = 4
+    elif interview_duration_minutes <= 10:
+        num_questions = 6
+    elif interview_duration_minutes <= 15:
+        num_questions = 8
+    else:
+        num_questions = 10
     easy_count    = max(1, num_questions // 3)
     medium_count  = max(1, num_questions // 3)
     hard_count    = num_questions - easy_count - medium_count
@@ -63,28 +70,70 @@ def generate_questions(pdf_file, job_role, interview_duration_minutes):
     resume_context = build_resume_context(pdf_file)
 
     prompt = f"""
-You are a professional HR interviewer conducting a technical interview.
+You are an experienced Senior Technical Interviewer at a top product-based company.
 
 Candidate Resume:
 {resume_context}
 
-Target Job Role: {job_role}
-Interview Duration: {interview_duration_minutes} minutes
-Total Questions Needed: {num_questions} ({easy_count} easy, {medium_count} medium, {hard_count} hard)
+Target Job Role:
+{job_role}
 
-Generate exactly {num_questions} interview questions strictly based on the candidate's
-resume and the target job role. Questions should feel like a real HR interview.
+Interview Duration:
+{interview_duration_minutes} minutes
 
-Rules:
-- Easy: Basic questions about listed skills and background
-- Medium: Situational or project-based questions from their experience
-- Hard: Deep technical or problem-solving questions challenging their expertise
+Generate exactly {num_questions} interview questions.
 
-Return ONLY valid JSON, no explanation, no markdown:
+Difficulty Distribution:
+- Easy: {easy_count}
+- Medium: {medium_count}
+- Hard: {hard_count}
+
+IMPORTANT RULES:
+
+1. Questions must primarily evaluate the candidate for the role "{job_role}".
+
+2. Use the resume only to personalize the interview.
+If the resume mentions specific technologies, projects, internships or achievements, include questions related to them.
+
+3. Around 60% of the questions should be based on the candidate's resume.
+
+4. Around 40% should test role-specific concepts that may not be present in the resume.
+
+5. Choose questions from DIFFERENT topics.
+Do NOT ask multiple questions from the same concept.
+
+6. Include a healthy mix of:
+- Theory
+- Practical implementation
+- Project discussion
+- Debugging
+- Real-world scenarios
+- Best practices
+
+7. Do NOT generate generic HR questions like:
+- Tell me about yourself
+- Why should we hire you?
+- What are your strengths?
+
+8. Every question must be unique.
+
+9. Avoid repetitive wording.
+
+10. Questions should become gradually harder.
+
+11. Keep each question under 35 words.
+
+12. Ask questions exactly like a real interviewer.
+13. Never repeat a question that tests the same underlying concept.
+For example, if one question asks about React Hooks,
+do not ask another question about useEffect or useState unless it explores a completely different real-world scenario.
+
+Return ONLY valid JSON.
+
 {{
-  "easy": ["question1", "question2"],
-  "medium": ["question1", "question2"],
-  "hard": ["question1", "question2"]
+    "easy":[...],
+    "medium":[...],
+    "hard":[...]
 }}
 """
 
@@ -100,10 +149,11 @@ Return ONLY valid JSON, no explanation, no markdown:
         text  = text[start:end]
 
         questions = json.loads(text)
-
         for key in ["easy", "medium", "hard"]:
-            if key not in questions:
+            if not isinstance(questions.get(key), list):
                 questions[key] = []
+
+        
 
         # Hard cap to exact counts
         return {
@@ -151,7 +201,7 @@ class InterviewSession:
 
     def submit_answer(self, question: str, answer: str) -> dict:
         prompt = f"""
-You are a strict but fair HR interviewer evaluating a candidate's answer.
+You are an experienced Senior Technical Interviewer evaluating a candidate fairly and consistently.
 
 Resume Context:
 {self.resume_context}
@@ -159,17 +209,62 @@ Resume Context:
 Interview Question:
 {question}
 
-Candidate's Answer:
+Candidate Answer:
 {answer}
 
-Evaluate the candidate objectively.
+Evaluate the answer based on:
+- Technical accuracy
+- Understanding of concepts
+- Practical knowledge
+- Communication clarity
+- Completeness of the answer
 
-Scoring Rules:
-- 9-10 = Excellent
-- 7-8 = Good
-- 5-6 = Average
-- 3-4 = Weak
-- 0-2 = Incorrect
+IMPORTANT SCORING GUIDELINES:
+
+- 9-10:
+  Complete, technically accurate, well explained, demonstrates deep understanding.
+
+- 7-8:
+  Good answer with correct concepts. Minor details may be missing but overall interview-worthy.
+
+- 5-6:
+  Average fresher-level answer. Candidate understands the topic but explanation is incomplete or lacks depth.
+
+- 3-4:
+  Weak answer. Candidate knows only small parts of the topic or has significant gaps.
+
+- 0-2:
+  Completely incorrect answer, irrelevant answer, or no meaningful technical understanding.
+
+IMPORTANT:
+
+- DO NOT be overly strict.
+- If the candidate shows partial understanding, NEVER give below 5 unless the answer is mostly incorrect.
+- Ignore grammar mistakes.
+- Ignore pronunciation mistakes.
+- Focus only on technical understanding.
+- Reward practical examples when present.
+- If the candidate gives a correct answer but misses some details,
+reward the correct understanding instead of penalizing heavily.
+
+Feedback Rules:
+
+- Feedback should be constructive.
+- Mention what was good.
+- Mention what can be improved.
+- Never insult the candidate.
+
+Strengths:
+Return 2-3 short bullet points.
+
+Weaknesses:
+Return 2-3 short bullet points.
+
+Missed Points:
+Return the important concepts that were not mentioned.
+
+Ideal Answer:
+Provide a concise model interview answer (maximum 120 words).
 
 Return ONLY valid JSON.
 
@@ -199,12 +294,24 @@ Return ONLY valid JSON.
             logger.info(f"Parsed JSON:\n{result}")
             print("Parsed JSON:\n", result)
 
-            score = result.get("score", 0)
-            feedback = result.get("feedback", "")
+            try:
+                 score = float(result.get("score", 0))
+            except:
+                score = 0
+
+            score = max(0, min(10, round(score, 1)))
+            feedback = str(result.get("feedback", ""))
             strengths = result.get("strengths", [])
+            if not isinstance(strengths, list):
+                strengths = [str(strengths)]
             weaknesses = result.get("weaknesses", [])
+            if not isinstance(weaknesses, list):
+                weaknesses = [str(weaknesses)]
+
             missed = result.get("missed_points", [])
-            ideal_answer = result.get("ideal_answer", "")
+            if not isinstance(missed, list):
+                missed = [str(missed)]
+            ideal_answer = str(result.get("ideal_answer", ""))
 
         except Exception as e:
             print(f"Evaluation error: {e}")

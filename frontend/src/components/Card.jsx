@@ -171,7 +171,7 @@ console.log("Summary before saving:", summaryToSave);
   }
 
   if (stage === STAGE.FINISHED) {
-    return <SummaryView summary={data.summary} scoreColor={scoreColor} />;
+    return <SummaryView summary={data.summary} scoreColor={scoreColor} user={user} />;
   }
 
   return (

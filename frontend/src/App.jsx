@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import InterviewDetails from "./components/InterviewDetails";
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
 
   const [user, setUser] = useState(null);
@@ -46,7 +47,9 @@ useEffect(() => {
            />
             <Route
         path="/dashboard"
-        element={<Dashboard user={user} />}
+        element={<ProtectedRoute user={user}>
+      <Dashboard user={user} />
+    </ProtectedRoute>}
       />
             <Route
               path="/interview/:id"

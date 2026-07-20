@@ -2,6 +2,7 @@
 import { auth, provider } from "../firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Navbar = ({ user, setUser }) => {
   
@@ -38,6 +39,12 @@ const Navbar = ({ user, setUser }) => {
 
       {user ? (
         <div className="flex items-center gap-4">
+          <Link
+  to="/dashboard"
+  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition"
+>
+  Dashboard
+</Link>
          <img
   src={user.photoURL}
   alt="profile"
