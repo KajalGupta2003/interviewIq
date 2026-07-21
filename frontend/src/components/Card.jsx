@@ -154,6 +154,31 @@ console.log("Summary before saving:", summaryToSave);
     return "text-red-400";
   };
 
+  const handleStopInterview = () => {
+  const confirmStop = window.confirm(
+    "Are you sure you want to end this interview?"
+  );
+
+  if (!confirmStop) return;
+
+  forceFinish();
+};
+
+useEffect(() => {
+  const handleBeforeUnload = (e) => {
+    if (stage !== STAGE.SETUP && stage !== STAGE.FINISHED) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [stage]);
+
   if (stage === STAGE.SETUP) {
     return (
       <SetupView
@@ -192,6 +217,7 @@ console.log("Summary before saving:", summaryToSave);
             ? setStage(STAGE.FINISHED)
             : askQuestion(data.nextQuestion, data.questionNum + 1)
         }
+        onStopInterview={handleStopInterview}
         scoreColor={scoreColor}
       />
       <Camera isActive={isInterviewActive} setSessionData={setSessionData} />

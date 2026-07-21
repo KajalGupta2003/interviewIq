@@ -18,6 +18,7 @@ const InterviewView = ({
   onStartListening,
   onRetry,
   onNext,
+  onStopInterview,
 }) => {
   // We don't need manual scoreColor logic here anymore because ScoreBadge handles it!
 
@@ -42,85 +43,85 @@ const InterviewView = ({
       {(stage === "listening" ||
         stage === "result" ||
         stage === "evaluating") && (
-        <div className="bg-black/20 rounded-xl p-4 mb-5 border border-white/5 min-h-[60px]">
-          <p className="text-xs text-gray-500 mb-1">Your answer:</p>
-          <p className="text-gray-300 text-sm italic leading-relaxed">
-            {transcript || (stage === "listening" ? "Listening..." : "—")}
-          </p>
-        </div>
-      )}
+          <div className="bg-black/20 rounded-xl p-4 mb-5 border border-white/5 min-h-[60px]">
+            <p className="text-xs text-gray-500 mb-1">Your answer:</p>
+            <p className="text-gray-300 text-sm italic leading-relaxed">
+              {transcript || (stage === "listening" ? "Listening..." : "—")}
+            </p>
+          </div>
+        )}
 
       {/* ── 4. Evaluation Result  ── */}
-    
-{stage === "result" && feedback && (
-  <div className="bg-black/30 rounded-xl p-4 mb-5 border border-white/10 animate-in fade-in zoom-in duration-300">
 
-    <div className="flex items-center gap-3 mb-3">
-      <ScoreBadge score={feedback.score} />
-      <span className="text-sm text-gray-300">
-        {feedback.feedback}
-      </span>
-    </div>
+      {stage === "result" && feedback && (
+        <div className="bg-black/30 rounded-xl p-4 mb-5 border border-white/10 animate-in fade-in zoom-in duration-300">
 
-    {/* Strengths */}
-    {feedback.strengths?.length > 0 && (
-      <div className="mb-3">
-        <p className="text-xs text-green-400 font-bold uppercase mb-1">
-          Strengths
-        </p>
+          <div className="flex items-center gap-3 mb-3">
+            <ScoreBadge score={feedback.score} />
+            <span className="text-sm text-gray-300">
+              {feedback.feedback}
+            </span>
+          </div>
 
-        {feedback.strengths.map((item, i) => (
-          <p key={i} className="text-xs text-green-300">
-            • {item}
-          </p>
-        ))}
-      </div>
-    )}
+          {/* Strengths */}
+          {feedback.strengths?.length > 0 && (
+            <div className="mb-3">
+              <p className="text-xs text-green-400 font-bold uppercase mb-1">
+                Strengths
+              </p>
 
-    {/* Weaknesses */}
-    {feedback.weaknesses?.length > 0 && (
-      <div className="mb-3">
-        <p className="text-xs text-red-400 font-bold uppercase mb-1">
-          Weaknesses
-        </p>
+              {feedback.strengths.map((item, i) => (
+                <p key={i} className="text-xs text-green-300">
+                  • {item}
+                </p>
+              ))}
+            </div>
+          )}
 
-        {feedback.weaknesses.map((item, i) => (
-          <p key={i} className="text-xs text-red-300">
-            • {item}
-          </p>
-        ))}
-      </div>
-    )}
+          {/* Weaknesses */}
+          {feedback.weaknesses?.length > 0 && (
+            <div className="mb-3">
+              <p className="text-xs text-red-400 font-bold uppercase mb-1">
+                Weaknesses
+              </p>
 
-    {/* Missed Points */}
-    {feedback.missed_points?.length > 0 && (
-      <div className="mb-3">
-        <p className="text-xs text-yellow-400 font-bold uppercase mb-1">
-          Missed Points
-        </p>
+              {feedback.weaknesses.map((item, i) => (
+                <p key={i} className="text-xs text-red-300">
+                  • {item}
+                </p>
+              ))}
+            </div>
+          )}
 
-        {feedback.missed_points.map((item, i) => (
-          <p key={i} className="text-xs text-yellow-300">
-            • {item}
-          </p>
-        ))}
-      </div>
-    )}
+          {/* Missed Points */}
+          {feedback.missed_points?.length > 0 && (
+            <div className="mb-3">
+              <p className="text-xs text-yellow-400 font-bold uppercase mb-1">
+                Missed Points
+              </p>
 
-    {/* Ideal Answer */}
-    {feedback.ideal_answer && (
-      <div className="border-t border-white/10 pt-3">
-        <p className="text-xs text-cyan-400 font-bold uppercase mb-1">
-          Ideal Answer
-        </p>
+              {feedback.missed_points.map((item, i) => (
+                <p key={i} className="text-xs text-yellow-300">
+                  • {item}
+                </p>
+              ))}
+            </div>
+          )}
 
-        <p className="text-sm text-gray-300 leading-relaxed">
-          {feedback.ideal_answer}
-        </p>
-      </div>
-    )}
-  </div>
-)}
+          {/* Ideal Answer */}
+          {feedback.ideal_answer && (
+            <div className="border-t border-white/10 pt-3">
+              <p className="text-xs text-cyan-400 font-bold uppercase mb-1">
+                Ideal Answer
+              </p>
+
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {feedback.ideal_answer}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
       {error && (
         <p className="text-red-400 text-sm mb-3 bg-red-400/10 p-2 rounded">
           {error}
@@ -165,6 +166,15 @@ const InterviewView = ({
             🎙 Start Answering
           </Button>
         )}
+      </div>
+      <div className="mt-5 pt-4 border-t border-white/10">
+        <Button
+          variant="danger"
+          onClick={onStopInterview}
+          className="w-full"
+        >
+          End Interview
+        </Button>
       </div>
     </div>
   );
