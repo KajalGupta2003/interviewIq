@@ -16,7 +16,7 @@ from services.question_engine import generate_questions, InterviewSession
 import services.question_engine
 print("Imported from:", generate_questions.__module__)
 print("Loaded from:", services.question_engine.__file__)
-from services.vision import analyze_frame
+
 from database import db,interviews_collection
 from models.user import User
 from models.interview import Interview
@@ -287,6 +287,7 @@ class AnalysisRequest(BaseModel):
 
 @app.post("/analyze")
 async def analyze_camera(data: AnalysisRequest):
+    from services.vision import analyze_frame
     result = analyze_frame(data.image)
     return {
         "eye_contact": result["eye_contact"],
