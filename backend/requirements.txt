@@ -40,8 +40,9 @@ mediapipe==0.10.35
 murmurhash==1.0.15
 numpy==2.4.4
 ollama==0.6.1
-opencv-contrib-python==4.13.0.92
-opencv-python==4.13.0.92
+
+opencv-python-headless==4.13.0.92
+opencv-contrib-python-headless==4.13.0.92
 packaging==26.0
 pdfminer.six==20251230
 pdfplumber==0.11.9
