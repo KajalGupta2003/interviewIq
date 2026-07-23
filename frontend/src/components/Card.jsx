@@ -113,7 +113,7 @@ const summaryToSave = {
   },
 };
 console.log("Summary before saving:", summaryToSave);    
-  await axios.post("http://localhost:8000/save_interview", {
+  await axios.post(`${import.meta.env.VITE_API_URL}/save_interview`, {
         userEmail: user.email,
         role,
         duration: parseInt(time),

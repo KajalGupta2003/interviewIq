@@ -11,7 +11,7 @@ const InterviewDetails = () => {
     const fetchInterview = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/interview/${id}`
+          `${import.meta.env.VITE_API_URL}/interview/${id}`
         );
 
         setInterview(res.data);
@@ -21,7 +21,7 @@ const InterviewDetails = () => {
     };
 
     fetchInterview();
-  }, [id]);
+  }, [id]); 
 
   if (!interview) {
     return (

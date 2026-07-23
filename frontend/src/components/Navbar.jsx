@@ -13,7 +13,7 @@ const Navbar = ({ user, setUser }) => {
 
       
 
-      await axios.post("http://localhost:8000/save_user", {
+      await axios.post( `${import.meta.env.VITE_API_URL}/save_user`, {
         name: result.user.displayName,
         email: result.user.email,
         photo: result.user.photoURL,

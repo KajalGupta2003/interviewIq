@@ -44,7 +44,7 @@ export const useInterview = () => {
     try {
       if (audioRef.current) audioRef.current.pause();
 
-      const response = await fetch("http://localhost:8000/speak", {
+      const response = await fetch("https://interviewiq-production-8a54.up.railway.app/speak", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
@@ -80,7 +80,7 @@ export const useInterview = () => {
     setData((prev) => ({ ...prev, error: "" }));
     try {
       const res = await axios.post(
-        "http://localhost:8000/start_interview",
+        "https://interviewiq-production-8a54.up.railway.app/start_interview",
         formData,
       );
       setSessionId(res.data.session_id);
@@ -177,7 +177,7 @@ export const useInterview = () => {
 
     setStage(STAGE.EVALUATING);
     try {
-      const res = await axios.post("http://localhost:8000/submit_answer", {
+      const res = await axios.post("https://interviewiq-production-8a54.up.railway.app/submit_answer", {
         session_id:sessionId,
         question: currentQuestionRef.current,
         answer,

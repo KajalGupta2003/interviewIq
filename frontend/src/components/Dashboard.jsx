@@ -23,7 +23,7 @@ const Dashboard = ({ user }) => {
 
       try {
         const res = await axios.get(
-          `http://localhost:8000/user_interviews/${user.email}`
+          `${import.meta.env.VITE_API_URL}/user_interviews/${user.email}`
         );
 
         setInterviews(res.data.interviews);
