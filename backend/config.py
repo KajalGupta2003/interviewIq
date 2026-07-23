@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GROQ_API_KEY=os.getenv("GROQ_API_KEY")
-ELEVEN_API_KEY=os.getenv("ElEVEN_API_KEY")
+ELEVEN_API_KEY=os.getenv("ELEVEN_API_KEY")
 
 FRONTEND_URL=os.getenv("FRONTEND_URL","http://localhost:5173")
 VOICE_ID = os.getenv(
