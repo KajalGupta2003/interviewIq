@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 # Global session (for single user / college demo)
-session = {}
+sessions = {}
 
 # --- Endpoints ---
 
@@ -214,22 +214,22 @@ async def start_interview(
     if not all_questions:
         raise HTTPException(status_code=500, detail="Failed to generate questions. Please try again.")
 
-    session = InterviewSession(question_bank, time, resume_context)
+    interview_session = InterviewSession(question_bank, time, resume_context)
 
     session_id = str(uuid.uuid4())
 
-    sessions[session_id] = session   
+    sessions[session_id] = interview_session   
     logger.info(
-    f"Interview session created with {len(session.questions)} questions"
+    f"Interview session created with {len(interview_session.questions)} questions"
     )
 
-    first_question = session.next_question()
+    first_question = interview_session.next_question()
 
     return {
         "session_id": session_id,
         "first_question": first_question,
         # "total_questions": result["total"],
-        "total_questions": len(session.questions),
+        "total_questions": len(interview_session.questions),
         "resume_context": resume_context
     }
 
