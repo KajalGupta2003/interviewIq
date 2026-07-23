@@ -1,5 +1,6 @@
 
 print("MAIN FILE EXECUTED")
+import uuid
 from fastapi.responses import StreamingResponse
 from services.voice import text_to_speech
 import io
@@ -32,7 +33,7 @@ app.add_middleware(
 )
 
 # Global session (for single user / college demo)
-session = None
+session = {}
 
 # --- Endpoints ---
 
@@ -165,7 +166,7 @@ async def start_interview(
     role: str = Form(...),
     time: int = Form(...)
 ):
-    global session
+   
     if not file.filename:
         raise HTTPException(
             status_code=400,
@@ -214,6 +215,10 @@ async def start_interview(
         raise HTTPException(status_code=500, detail="Failed to generate questions. Please try again.")
 
     session = InterviewSession(question_bank, time, resume_context)
+
+    session_id = str(uuid.uuid4())
+
+    sessions[session_id] = session   
     logger.info(
     f"Interview session created with {len(session.questions)} questions"
     )
@@ -221,6 +226,7 @@ async def start_interview(
     first_question = session.next_question()
 
     return {
+        "session_id": session_id,
         "first_question": first_question,
         # "total_questions": result["total"],
         "total_questions": len(session.questions),
@@ -232,9 +238,14 @@ async def start_interview(
 @app.post("/submit_answer")
 async def submit_answer(data: dict):
     logger.info("Candidate submitted an answer")
+    session_id = data.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=400, detail="Session ID missing")
 
+
+    session = sessions.get(session_id)
     if session is None:
-        raise HTTPException(status_code=400, detail="Interview not started")
+        raise HTTPException(status_code=400, detail="Interview session not found")
 
     score  = session.submit_answer(data["question"], data["answer"])
     logger.info(f"Score object from question_engine: {score}")
@@ -242,6 +253,8 @@ async def submit_answer(data: dict):
     next_q = session.next_question()
 
     if next_q is None:
+        summary = session.interview_summary()
+        del sessions[session_id]
         logger.info("Interview completed")
         return {
             "score": score,

@@ -12,6 +12,7 @@ export const STAGE = {
 
 export const useInterview = () => {
   const [stage, setStage] = useState(STAGE.SETUP);
+  const [sessionId, setSessionId] = useState(null);
   const [data, setData] = useState({
     question: "",
     questionNum: 1,
@@ -82,8 +83,9 @@ export const useInterview = () => {
         "http://localhost:8000/start_interview",
         formData,
       );
+      setSessionId(res.data.session_id);
 
-      // ✅ Guard: check first_question exists before proceeding
+      // Guard: check first_question exists before proceeding
       if (!res.data.first_question) {
         setData((prev) => ({
           ...prev,
@@ -176,6 +178,7 @@ export const useInterview = () => {
     setStage(STAGE.EVALUATING);
     try {
       const res = await axios.post("http://localhost:8000/submit_answer", {
+        session_id:sessionId,
         question: currentQuestionRef.current,
         answer,
       });
