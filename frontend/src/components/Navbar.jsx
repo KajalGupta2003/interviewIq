@@ -2,18 +2,19 @@
 import { auth, provider } from "../firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
 
 const Navbar = ({ user, setUser }) => {
-  
+  const location = useLocation();
   const handleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      
 
-      
 
-      await axios.post( `${import.meta.env.VITE_API_URL}/save_user`, {
+
+
+      await axios.post(`${import.meta.env.VITE_API_URL}/save_user`, {
         name: result.user.displayName,
         email: result.user.email,
         photo: result.user.photoURL,
@@ -33,31 +34,37 @@ const Navbar = ({ user, setUser }) => {
 
   return (
     <nav className="px-8 py-5 flex justify-between items-center backdrop-blur-md bg-white/5 border-b border-white/10">
-      <div className="text-2xl font-semibold tracking-wide">
+      <Link
+        to="/"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="text-2xl font-semibold tracking-wide hover:text-indigo-400 transition-colors duration-200 cursor-pointer"
+      >
         InterviewIQ
-      </div>
+      </Link>
 
       {user ? (
         <div className="flex items-center gap-4">
-          <Link
-  to="/dashboard"
-  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition"
->
-  Dashboard
-</Link>
-         <img
-  src={user.photoURL}
-  alt="profile"
-  className="w-10 h-10 rounded-full border border-white"
-  referrerPolicy="no-referrer"
-  onError={(e) => {
-    console.log("Image Error");
-    console.log(user.photoURL);
+          {location.pathname !== "/dashboard" && (
+            <Link
+              to="/dashboard"
+              className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition"
+            >
+              Dashboard
+            </Link>
+          )}
+          <img
+            src={user.photoURL}
+            alt="profile"
+            className="w-10 h-10 rounded-full border border-white"
+            referrerPolicy="no-referrer"
+            onError={(e) => {
+              console.log("Image Error");
+              console.log(user.photoURL);
 
-    // fallback image
-    e.target.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.displayName);
-  }}
-/>
+              // fallback image
+              e.target.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.displayName);
+            }}
+          />
 
           <span className="text-sm">{user.displayName}</span>
 

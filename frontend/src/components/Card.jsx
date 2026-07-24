@@ -43,17 +43,17 @@ const Card = ({ user }) => {
         : eyeContactPercent >= 40
           ? "Medium"
           : "Low";
-
-    const avgScore = data.scores.length
+    const answered = data.answered || [];
+    const avgScore = answered.length
       ? Math.round(
-          (data.scores.reduce((a, b) => a + b, 0) / data.scores.length) * 100,
+          (answered.reduce((sum, item) => sum+ item.score, 0) /answered.length) * 100
         ) / 100
       : 0;
 
     const summary = {
       average_score: avgScore,
       performance:
-        data.scores.length === 0
+        answered.length === 0
           ? "No Answers"
           : avgScore >= 8
             ? "Excellent"
@@ -62,7 +62,7 @@ const Card = ({ user }) => {
               : avgScore >= 4
                 ? "Average"
                 : "Needs Improvement",
-      total_questions: data.answered?.length || 0,
+      total_questions: answered.length,
       details: data.answered || [],
       camera: {
         total_blinks: totalBlinks,
