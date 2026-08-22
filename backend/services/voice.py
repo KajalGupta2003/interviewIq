@@ -4,7 +4,7 @@ import os
 ELEVEN_API_KEY = os.getenv("ELEVEN_API_KEY")
 
 
-VOICE_ID = "ImyAQXVPmdjA0EnqOdjw"
+VOICE_ID = "ZZZwjZhuRsQpxCX9IW9e"
 
 
 def text_to_speech(text: str) -> bytes:
@@ -29,7 +29,7 @@ def text_to_speech(text: str) -> bytes:
 
     response = requests.post(url, json=data, headers=headers)
 
-    # 🔥 Debug (keep for now)
+    # Debug (keep for now)
     print("STATUS:", response.status_code)
     # print("RESPONSE:", response.text[:200])
 

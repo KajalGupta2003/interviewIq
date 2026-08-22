@@ -12,6 +12,8 @@ from services.parser import extract_text_from_pdf
 from services.resume_extractor import extract_skills, extract_experience, extract_projects, extract_achievements
 from services.question_engine import generate_questions, InterviewSession
 from services.vision import analyze_frame
+from routes import auth
+from routes import interview
 app = FastAPI()
 
 app.add_middleware(
@@ -70,7 +72,7 @@ async def start_interview(
     question_bank  = result["questions"]
     resume_context = result["resume_context"]
 
-    # ✅ Guard: check if questions were actually generated
+    #  Guard: check if questions were actually generated
     all_questions = (
         question_bank.get("easy", []) +
         question_bank.get("medium", []) +
@@ -137,3 +139,5 @@ async def analyze_camera(data: AnalysisRequest):
         "blink":       result["blink"],
         "status":      "success"
     }
+app.include_router(auth.router, prefix="/auth")
+app.include_router(interview.router, prefix="/interview")

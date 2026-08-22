@@ -1,14 +1,20 @@
 import cv2
 import numpy as np
 import base64
+import mediapipe as mp
+
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh(
+    static_image_mode=True,
+    max_num_faces=1,
+    refine_landmarks=True
+)
 
 def analyze_frame(base64_image: str) -> dict:
     try:
-        import mediapipe as mp
-
-        # Decode base64 image
         header, data = base64_image.split(",", 1)
         img_bytes = base64.b64decode(data)
+
         np_arr = np.frombuffer(img_bytes, np.uint8)
         frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
@@ -18,19 +24,13 @@ def analyze_frame(base64_image: str) -> dict:
         img_h, img_w = frame.shape[:2]
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        with mp.solutions.face_mesh.FaceMesh(
-            static_image_mode=True,
-            max_num_faces=1,
-            refine_landmarks=True
-        ) as face_mesh:
-            results = face_mesh.process(rgb)
+        results = face_mesh.process(rgb)
 
         if not results.multi_face_landmarks:
             return {"eye_contact": "No Face Detected", "blink": False}
 
         landmarks = results.multi_face_landmarks[0].landmark
 
-        # ── Blink Detection via Eye Aspect Ratio ──
         LEFT_EYE  = [362, 385, 387, 263, 373, 380]
         RIGHT_EYE = [33, 160, 158, 133, 153, 144]
 
@@ -42,12 +42,12 @@ def analyze_frame(base64_image: str) -> dict:
             return (v1 + v2) / (2.0 * h) if h != 0 else 0
 
         avg_ear = (ear(LEFT_EYE) + ear(RIGHT_EYE)) / 2.0
-        blink   = bool(avg_ear < 0.2)
+        blink = avg_ear < 0.2
 
-        # ── Eye Contact Detection ──
-        nose         = landmarks[1]
-        left_temple  = landmarks[234]
+        nose = landmarks[1]
+        left_temple = landmarks[234]
         right_temple = landmarks[454]
+
         face_center_x = (left_temple.x + right_temple.x) / 2
         offset = abs(nose.x - face_center_x)
 
@@ -61,5 +61,5 @@ def analyze_frame(base64_image: str) -> dict:
         return {"eye_contact": eye_contact, "blink": blink}
 
     except Exception as e:
-        print(f"Vision error: {e}")
+        print("Vision error:", repr(e))   #  IMPORTANT FIX
         return {"eye_contact": "Unknown", "blink": False}
