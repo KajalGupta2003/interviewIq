@@ -1,5 +1,5 @@
-
 print("MAIN FILE EXECUTED")
+
 import uuid
 from fastapi.responses import StreamingResponse
 from services.voice import text_to_speech
@@ -9,18 +9,36 @@ from logger import logger
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from config import FRONTEND_URL,ALLOWED_DURATIONS
+from config import FRONTEND_URL, ALLOWED_DURATIONS
+
 from services.parser import extract_text_from_pdf
-from services.resume_extractor import extract_skills, extract_experience, extract_projects, extract_achievements
+from services.resume_extractor import (
+    extract_skills,
+    extract_experience,
+    extract_projects,
+    extract_achievements
+)
+
 from services.question_engine import generate_questions, InterviewSession
+
+# Debugging
 import services.question_engine
 print("Imported from:", generate_questions.__module__)
 print("Loaded from:", services.question_engine.__file__)
 
-from database import db,interviews_collection
+# Database
+from database import db, interviews_collection
 from models.user import User
 from models.interview import Interview
 from bson import ObjectId
+
+# Vision
+from services.vision import analyze_frame
+
+# Routes
+from routes import auth
+from routes import interview
+
 app = FastAPI()
 
 app.add_middleware(
@@ -205,7 +223,7 @@ async def start_interview(
     question_bank  = result["questions"]
     resume_context = result["resume_context"]
 
-    # ✅ Guard: check if questions were actually generated
+    #  Guard: check if questions were actually generated
     all_questions = (
         question_bank.get("easy", []) +
         question_bank.get("medium", []) +
@@ -294,3 +312,5 @@ async def analyze_camera(data: AnalysisRequest):
         "blink":       result["blink"],
         "status":      "success"
     }
+app.include_router(auth.router, prefix="/auth")
+app.include_router(interview.router, prefix="/interview")
