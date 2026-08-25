@@ -65,6 +65,7 @@ pycparser==3.0
 pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
+pymongo==4.15.5
 pyparsing==3.3.2
 pypdfium2==5.5.0
 python-dateutil==2.9.0.post0
