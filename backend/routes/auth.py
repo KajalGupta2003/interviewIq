@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from db.mongo import users_collection
+from database import users_collection
 from models.user.model import create_user_doc, user_schema
 from services.google_auth import verify_google_token
 from utils.jwtHandler import create_access_token

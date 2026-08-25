@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from db.mongo import interviews_collection
+from database import interviews_collection
 from models.interview.model import create_interview_doc, interview_schema
 from utils.jwtHandler import verify_access_token
 
