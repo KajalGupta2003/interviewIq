@@ -18,7 +18,7 @@ client = Groq(api_key=GROQ_API_KEY)
 def call_llm(prompt: str) -> str:
     logger.info("Sending request to Groq...")
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="llama-3.1-8b-instant",
         max_tokens=1000,
         messages=[{"role": "user", "content": prompt}]
     )
