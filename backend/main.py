@@ -28,8 +28,8 @@ print("Loaded from:", services.question_engine.__file__)
 
 # Database
 from database import db, interviews_collection
-from models.user import User
-from models.interview import Interview
+from models.user_schema import User
+from models.interview_schema import Interview
 from bson import ObjectId
 
 # Vision
