@@ -42,7 +42,7 @@ def analyze_frame(base64_image: str) -> dict:
             return (v1 + v2) / (2.0 * h) if h != 0 else 0
 
         avg_ear = (ear(LEFT_EYE) + ear(RIGHT_EYE)) / 2.0
-        blink = avg_ear < 0.2
+        blink = bool(avg_ear < 0.2)
 
         nose = landmarks[1]
         left_temple = landmarks[234]
