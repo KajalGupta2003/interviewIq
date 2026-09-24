@@ -9,7 +9,7 @@ ELEVEN_API_KEY=os.getenv("ELEVEN_API_KEY")
 FRONTEND_URL=os.getenv("FRONTEND_URL","http://localhost:5173")
 VOICE_ID = os.getenv(
     "VOICE_ID",
-    "ImyAQXVPmdjA0EnqOdjw"
+    "ZZZwjZhuRsQpxCX9IW9e"
 )
 ALLOWED_DURATIONS=[5,10,15,20]
 MONGODB_URI = os.getenv("MONGODB_URI")

@@ -19,11 +19,22 @@ def call_llm(prompt: str) -> str:
     logger.info("Sending request to Groq...")
     response = client.chat.completions.create(
         model="openai/gpt-oss-20b",
-        max_tokens=1000,
+        max_tokens=2500,
         messages=[{"role": "user", "content": prompt}]
     )
     logger.info("Groq response received successfully")
-    return response.choices[0].message.content
+    print("\n========== FULL GROQ RESPONSE ==========")
+    print(response)
+
+    print("\n========== CHOICE ==========")
+    print(response.choices[0])
+
+    print("\n========== MESSAGE ==========")
+    print(response.choices[0].message)
+
+    print("\n========== CONTENT ==========")
+    print(repr(response.choices[0].message.content))
+    return response.choices[0].message.content or ""
 
 
 # ── 1. Resume Context Builder ─────────────────────────────────────────────────
