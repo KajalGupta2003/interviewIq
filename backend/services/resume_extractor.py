@@ -95,7 +95,7 @@ def refine_skills(skills_list):
                 continue
             if not token.is_alpha:
                 continue
-            if clean_token.lower() not in BLACKLIST_SKILLS:
+            if clean_token.lower() in BLACKLIST_SKILLS:
                 continue
             if clean_token.lower() not in official_lower:
                 potential_skills.append(clean_token)
